@@ -1,9 +1,12 @@
+import os
 import mysql.connector
 from mysql.connector import Error
-HOST = "localhost"
-USER = "root"
-PASSWORD = ""
-DATABASE = "tecnico"
+
+HOST = os.getenv("DB_HOST", "localhost")
+USER = os.getenv("DB_USER", "root")
+PASSWORD = os.getenv("DB_PASSWORD", "")
+DATABASE = os.getenv("DB_NAME", "tecnico")
+
 
 def conectar():
     try:
@@ -11,11 +14,12 @@ def conectar():
             host=HOST,
             user=USER,
             password=PASSWORD,
-            database=DATABASE
+            database=DATABASE,
         )
         if conexion.is_connected():
-            print("Conexión exitosa a la base de datos")
             return conexion
-    except Error as e:
-        print(f"Error al conectar a la base de datos: {e}")
-        return None
+        conexion.close()
+    except Error as error:
+        # No se devuelve el detalle interno de la conexión al cliente HTTP.
+        print(f"Error al conectar a la base de datos: {error}")
+    return None

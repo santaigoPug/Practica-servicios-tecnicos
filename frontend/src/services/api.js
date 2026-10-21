@@ -1,70 +1,59 @@
-const API_URL = "http://127.0.0.1:5000";
-export async function login(username, password) {
-const respuesta = await fetch(`${API_URL}/api/login`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-},
-body: JSON.stringify({
-username,
-password,
-}),
-});
-const datos = await respuesta.json();
-return {
-ok: respuesta.ok,
-status: respuesta.status,
-datos,
-};
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+
+async function request(path, options = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...options.headers,
+    },
+  });
+  const datos = await response.json().catch(() => ({}));
+  return { ok: response.ok, status: response.status, datos };
 }
-export async function obtenerClientes() {
-     const respuesta = await fetch("http://127.0.0.1:5000/api/clientes");
-     const datos = await respuesta.json();
-     return { ok: respuesta.ok, status: respuesta.status, datos };
+
+export function login(username, password) {
+  return request("/api/login", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+  });
 }
-const APIs_URL = "http://127.0.0.1:5000/api/clientes";
-export async function crearCliente(cliente) {
-const r = await fetch(API_URL, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify(cliente)
-});
-return { ok: r.ok, datos: await r.json() };
+
+export function obtenerClientes() {
+  return request("/api/clientes");
 }
-export async function actualizarCliente(id, cliente) {
-const r = await fetch(`${API_URL}/${id}`, {
-method: "PUT",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify(cliente)
-});
-return { ok: r.ok, datos: await r.json() };
+export function crearCliente(cliente) {
+  return request("/api/clientes", { method: "POST", body: JSON.stringify(cliente) });
 }
-export async function eliminarCliente(id) {
-     const r = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-return { ok: r.ok, datos: await r.json() };
+export function actualizarCliente(id, cliente) {
+  return request(`/api/clientes/${id}`, { method: "PUT", body: JSON.stringify(cliente) });
 }
-const API_TECNICOS = "http://127.0.0.1:5000/api/tecnicos";
-export async function obtenerTecnicos() {
-const r = await fetch(API_TECNICOS);
-return { ok: r.ok, datos: await r.json() };
+export function eliminarCliente(id) {
+  return request(`/api/clientes/${id}`, { method: "DELETE" });
 }
-export async function crearTecnico(tecnico) {
-const r = await fetch(API_TECNICOS, {
-method: "POST",
-headers: {"Content-Type":"application/json"},
-body: JSON.stringify(tecnico)
-});
-return { ok: r.ok, datos: await r.json() };
+
+export function obtenerTecnicos() {
+  return request("/api/tecnicos");
 }
-export async function actualizarTecnico(id, tecnico) {
-const r = await fetch(`${API_TECNICOS}/${id}`, {
-method: "PUT",
-headers: {"Content-Type":"application/json"},
-body: JSON.stringify(tecnico)
-});
-return { ok: r.ok, datos: await r.json() };
+export function crearTecnico(tecnico) {
+  return request("/api/tecnicos", { method: "POST", body: JSON.stringify(tecnico) });
 }
-export async function eliminarTecnico(id) {
-const r = await fetch(`${API_TECNICOS}/${id}`, {method:"DELETE"});
-return { ok: r.ok, datos: await r.json() };
+export function actualizarTecnico(id, tecnico) {
+  return request(`/api/tecnicos/${id}`, { method: "PUT", body: JSON.stringify(tecnico) });
+}
+export function eliminarTecnico(id) {
+  return request(`/api/tecnicos/${id}`, { method: "DELETE" });
+}
+
+export function obtenerServicios() {
+  return request("/api/servicios");
+}
+export function crearServicio(servicio) {
+  return request("/api/servicios", { method: "POST", body: JSON.stringify(servicio) });
+}
+export function actualizarServicio(id, servicio) {
+  return request(`/api/servicios/${id}`, { method: "PUT", body: JSON.stringify(servicio) });
+}
+export function eliminarServicio(id) {
+  return request(`/api/servicios/${id}`, { method: "DELETE" });
 }

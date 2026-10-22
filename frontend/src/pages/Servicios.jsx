@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   actualizarServicio, crearServicio, eliminarServicio,
   obtenerClientes, obtenerServicios, obtenerTecnicos,
@@ -92,47 +93,69 @@ function Servicios() {
   return (
     <main className="dashboard">
       <h1>Gestión de servicios</h1>
-      {mensaje && <p role="status">{mensaje}</p>}
+      <nav aria-label="Navegación principal">
+        <Link to="/dashboard">Inicio</Link>
+        <Link to="/clientes">Clientes</Link>
+        <Link to="/tecnicos">Técnicos</Link>
+        <Link to="/servicios">Servicios</Link>
+      </nav>
+      {mensaje && <p className="aviso" role="status">{mensaje}</p>}
       {(clientes.length === 0 || tecnicos.length === 0) && (
-        <p>Para registrar servicios, primero agrega al menos un cliente y un técnico.</p>
+        <p className="aviso aviso-info">Para registrar servicios, primero agrega al menos un cliente y un técnico.</p>
       )}
-      <form onSubmit={guardar}>
-        <label htmlFor="descripcion">Descripción</label>
-        <input id="descripcion" name="descripcion" value={formulario.descripcion} onChange={cambiarCampo} required maxLength={500} />
-        <label htmlFor="cliente_id">Cliente</label>
-        <select id="cliente_id" name="cliente_id" value={formulario.cliente_id} onChange={cambiarCampo} required>
-          <option value="">Selecciona un cliente</option>
-          {clientes.map((cliente) => <option key={cliente.id} value={cliente.id}>{cliente.nombre}</option>)}
-        </select>
-        <label htmlFor="tecnico_id">Técnico</label>
-        <select id="tecnico_id" name="tecnico_id" value={formulario.tecnico_id} onChange={cambiarCampo} required>
-          <option value="">Selecciona un técnico</option>
-          {tecnicos.map((tecnico) => <option key={tecnico.id} value={tecnico.id}>{tecnico.nombre} — {tecnico.especialidad}</option>)}
-        </select>
-        <label htmlFor="estado">Estado</label>
-        <select id="estado" name="estado" value={formulario.estado} onChange={cambiarCampo}>
-          {ESTADOS.map((estado) => <option key={estado} value={estado}>{estado}</option>)}
-        </select>
-        <button type="submit" disabled={clientes.length === 0 || tecnicos.length === 0}>
-          {editandoId ? "Guardar cambios" : "Registrar servicio"}
-        </button>
-        {editandoId && <button type="button" onClick={cancelar}>Cancelar</button>}
+      <form className="formulario-gestion" onSubmit={guardar}>
+        <div className="campo-formulario campo-descripcion">
+          <label htmlFor="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" value={formulario.descripcion} onChange={cambiarCampo} required maxLength={500} />
+        </div>
+        <div className="campo-formulario">
+          <label htmlFor="cliente_id">Cliente</label>
+          <select id="cliente_id" name="cliente_id" value={formulario.cliente_id} onChange={cambiarCampo} required>
+            <option value="">Selecciona un cliente</option>
+            {clientes.map((cliente) => <option key={cliente.id} value={cliente.id}>{cliente.nombre}</option>)}
+          </select>
+        </div>
+        <div className="campo-formulario">
+          <label htmlFor="tecnico_id">Técnico</label>
+          <select id="tecnico_id" name="tecnico_id" value={formulario.tecnico_id} onChange={cambiarCampo} required>
+            <option value="">Selecciona un técnico</option>
+            {tecnicos.map((tecnico) => <option key={tecnico.id} value={tecnico.id}>{tecnico.nombre} — {tecnico.especialidad}</option>)}
+          </select>
+        </div>
+        <div className="campo-formulario">
+          <label htmlFor="estado">Estado</label>
+          <select id="estado" name="estado" value={formulario.estado} onChange={cambiarCampo}>
+            {ESTADOS.map((estado) => <option key={estado} value={estado}>{estado}</option>)}
+          </select>
+        </div>
+        <div className="acciones-formulario">
+          <button type="submit" disabled={clientes.length === 0 || tecnicos.length === 0}>
+            {editandoId ? "Guardar cambios" : "Registrar servicio"}
+          </button>
+          {editandoId && <button className="boton-secundario" type="button" onClick={cancelar}>Cancelar</button>}
+        </div>
       </form>
       {cargando ? <p>Cargando servicios…</p> : (
-        <table>
-          <thead><tr><th>ID</th><th>Descripción</th><th>Cliente</th><th>Técnico</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {servicios.map((servicio) => (
-              <tr key={servicio.id}>
-                <td>{servicio.id}</td><td>{servicio.descripcion}</td><td>{servicio.cliente}</td>
-                <td>{servicio.tecnico}</td><td>{servicio.estado}</td><td>{servicio.fecha ? String(servicio.fecha).slice(0, 10) : "—"}</td>
-                <td><button type="button" onClick={() => editar(servicio)}>Editar</button>{" "}
-                  <button type="button" onClick={() => eliminar(servicio.id)}>Eliminar</button></td>
-              </tr>
-            ))}
-            {servicios.length === 0 && <tr><td colSpan="7">No hay servicios registrados.</td></tr>}
-          </tbody>
-        </table>
+        <div className="tabla-contenedor">
+          <table>
+            <thead><tr><th>ID</th><th>Descripción</th><th>Cliente</th><th>Técnico</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+            <tbody>
+              {servicios.map((servicio) => (
+                <tr key={servicio.id}>
+                  <td>{servicio.id}</td><td>{servicio.descripcion}</td><td>{servicio.cliente}</td>
+                  <td>{servicio.tecnico}</td><td>{servicio.estado}</td><td>{servicio.fecha ? String(servicio.fecha).slice(0, 10) : "—"}</td>
+                  <td>
+                    <div className="acciones-tabla">
+                      <button type="button" onClick={() => editar(servicio)}>Editar</button>
+                      <button className="boton-peligro" type="button" onClick={() => eliminar(servicio.id)}>Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {servicios.length === 0 && <tr><td className="tabla-vacia" colSpan="7">No hay servicios registrados.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );

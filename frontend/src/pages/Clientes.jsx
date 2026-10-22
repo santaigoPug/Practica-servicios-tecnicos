@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { actualizarCliente, crearCliente, eliminarCliente, obtenerClientes } from "../services/api";
 
 function Clientes() {
@@ -71,29 +72,43 @@ function Clientes() {
   return (
     <main className="dashboard">
       <h1>Gestión de clientes</h1>
-      {mensaje && <p role="status">{mensaje}</p>}
-      <form onSubmit={guardar}>
-        <label htmlFor="nombre-cliente">Nombre del cliente</label>
-        <input id="nombre-cliente" value={nombre} onChange={(e) => setNombre(e.target.value)} required maxLength={120} />
-        <button type="submit">{editandoId ? "Guardar cambios" : "Agregar cliente"}</button>
-        {editandoId && <button type="button" onClick={cancelarEdicion}>Cancelar</button>}
+      <nav aria-label="Navegación principal">
+        <Link to="/dashboard">Inicio</Link>
+        <Link to="/clientes">Clientes</Link>
+        <Link to="/tecnicos">Técnicos</Link>
+        <Link to="/servicios">Servicios</Link>
+      </nav>
+      {mensaje && <p className="aviso" role="status">{mensaje}</p>}
+      <form className="formulario-gestion formulario-sencillo" onSubmit={guardar}>
+        <div className="campo-formulario">
+          <label htmlFor="nombre-cliente">Nombre del cliente</label>
+          <input id="nombre-cliente" value={nombre} onChange={(e) => setNombre(e.target.value)} required maxLength={120} />
+        </div>
+        <div className="acciones-formulario">
+          <button type="submit">{editandoId ? "Guardar cambios" : "Agregar cliente"}</button>
+          {editandoId && <button className="boton-secundario" type="button" onClick={cancelarEdicion}>Cancelar</button>}
+        </div>
       </form>
       {cargando ? <p>Cargando clientes…</p> : (
-        <table>
-          <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
-          <tbody>
-            {clientes.map((cliente) => (
-              <tr key={cliente.id}>
-                <td>{cliente.id}</td><td>{cliente.nombre}</td>
-                <td>
-                  <button type="button" onClick={() => prepararEdicion(cliente)}>Editar</button>
-                  <button type="button" onClick={() => borrar(cliente.id)}>Eliminar</button>
-                </td>
-              </tr>
-            ))}
-            {clientes.length === 0 && <tr><td colSpan="3">No hay clientes registrados.</td></tr>}
-          </tbody>
-        </table>
+        <div className="tabla-contenedor">
+          <table>
+            <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
+            <tbody>
+              {clientes.map((cliente) => (
+                <tr key={cliente.id}>
+                  <td>{cliente.id}</td><td>{cliente.nombre}</td>
+                  <td>
+                    <div className="acciones-tabla">
+                      <button type="button" onClick={() => prepararEdicion(cliente)}>Editar</button>
+                      <button className="boton-peligro" type="button" onClick={() => borrar(cliente.id)}>Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {clientes.length === 0 && <tr><td className="tabla-vacia" colSpan="3">No hay clientes registrados.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );

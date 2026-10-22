@@ -35,24 +35,33 @@ setMensaje("No se pudo conectar con el servidor");
 }
 };
 return (
-<div className="contenedor">
-<div className="login">
+<main className="contenedor">
+<section className="login">
+<div className="login-marca" aria-hidden="true">ST</div>
 <h1>Servicios Técnicos</h1>
-<h2>Iniciar sesión</h2>
+<p className="login-subtitulo">Inicia sesión para continuar</p>
 <form onSubmit={manejarLogin}>
-<label>Username</label>
+<label htmlFor="username">Usuario</label>
 <input
+id="username"
+name="username"
 type="text"
 value={username}
 onChange={(e) => setUsername(e.target.value)}
 placeholder="Ingrese su username"
+autoComplete="username"
+required
 />
-<label>Contraseña</label>
+<label htmlFor="password">Contraseña</label>
 <input
+id="password"
+name="password"
 type="password"
 value={password}
 onChange={(e) => setPassword(e.target.value)}
 placeholder="Ingrese su contraseña"
+autoComplete="current-password"
+required
 />
 <button type="submit">Ingresar</button>
 </form>
@@ -61,8 +70,8 @@ placeholder="Ingrese su contraseña"
 {mensaje}
 </p>
 )}
-</div>
-</div>
+</section>
+</main>
 );
 }
 export default Login;

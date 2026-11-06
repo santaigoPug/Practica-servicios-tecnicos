@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { actualizarCliente, crearCliente, eliminarCliente, obtenerClientes } from "../services/api";
+import Layout from "../components/Layout";
+import { IconoClientes } from "../components/Iconos";
+
+const iniciales = (nombre = "") =>
+  nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "?";
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);
@@ -70,47 +74,67 @@ function Clientes() {
   const cancelarEdicion = () => { setEditandoId(null); setNombre(""); setMensaje(""); };
 
   return (
-    <main className="dashboard">
-      <h1>Gestión de clientes</h1>
-      <nav aria-label="Navegación principal">
-        <Link to="/dashboard">Inicio</Link>
-        <Link to="/clientes">Clientes</Link>
-        <Link to="/tecnicos">Técnicos</Link>
-        <Link to="/servicios">Servicios</Link>
-      </nav>
+    <Layout>
       {mensaje && <p className="aviso" role="status">{mensaje}</p>}
-      <form className="formulario-gestion formulario-sencillo" onSubmit={guardar}>
-        <div className="campo-formulario">
-          <label htmlFor="nombre-cliente">Nombre del cliente</label>
-          <input id="nombre-cliente" value={nombre} onChange={(e) => setNombre(e.target.value)} required maxLength={120} />
-        </div>
-        <div className="acciones-formulario">
-          <button type="submit">{editandoId ? "Guardar cambios" : "Agregar cliente"}</button>
-          {editandoId && <button className="boton-secundario" type="button" onClick={cancelarEdicion}>Cancelar</button>}
-        </div>
-      </form>
-      {cargando ? <p>Cargando clientes…</p> : (
-        <div className="tabla-contenedor">
-          <table>
-            <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
-            <tbody>
+      <div className="bento">
+        <section className="tile tile-acento span-4">
+          <div className="tile-encabezado">
+            <span className="tile-etiqueta">Clientes</span>
+            <span className="tile-icono"><IconoClientes /></span>
+          </div>
+          <p className="stat-numero">{cargando ? "–" : clientes.length}</p>
+          <p className="stat-detalle">{clientes.length === 1 ? "cliente registrado" : "clientes registrados"}</p>
+        </section>
+
+        <section className="tile span-8">
+          <h2>{editandoId ? "Editar cliente" : "Nuevo cliente"}</h2>
+          <form className="formulario" onSubmit={guardar}>
+            <div className="campo">
+              <label htmlFor="nombre-cliente">Nombre del cliente</label>
+              <input
+                id="nombre-cliente"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Nombre completo o razón social"
+                required
+                maxLength={120}
+              />
+            </div>
+            <div className="acciones">
+              <button className="btn" type="submit">{editandoId ? "Guardar cambios" : "Agregar cliente"}</button>
+              {editandoId && (
+                <button className="btn btn-secundario" type="button" onClick={cancelarEdicion}>Cancelar</button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        <section className="tile span-12">
+          <h2>Listado de clientes</h2>
+          {cargando ? (
+            <p className="lista-vacia">Cargando clientes…</p>
+          ) : clientes.length === 0 ? (
+            <p className="lista-vacia">No hay clientes registrados.</p>
+          ) : (
+            <ul className="lista lista-rejilla">
               {clientes.map((cliente) => (
-                <tr key={cliente.id}>
-                  <td>{cliente.id}</td><td>{cliente.nombre}</td>
-                  <td>
-                    <div className="acciones-tabla">
-                      <button type="button" onClick={() => prepararEdicion(cliente)}>Editar</button>
-                      <button className="boton-peligro" type="button" onClick={() => borrar(cliente.id)}>Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
+                <li className="lista-item" key={cliente.id}>
+                  <span className="avatar" aria-hidden="true">{iniciales(cliente.nombre)}</span>
+                  <div className="lista-item-cuerpo">
+                    <span className="lista-item-titulo">{cliente.nombre}</span>
+                    <span className="lista-item-sub">ID {cliente.id}</span>
+                  </div>
+                  <div className="acciones">
+                    <button type="button" className="btn btn-secundario btn-chico" onClick={() => prepararEdicion(cliente)}>Editar</button>
+                    <button type="button" className="btn btn-peligro btn-chico" onClick={() => borrar(cliente.id)}>Eliminar</button>
+                  </div>
+                </li>
               ))}
-              {clientes.length === 0 && <tr><td className="tabla-vacia" colSpan="3">No hay clientes registrados.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </main>
+            </ul>
+          )}
+        </section>
+      </div>
+    </Layout>
   );
 }
 
